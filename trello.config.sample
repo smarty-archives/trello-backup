@@ -1,0 +1,8 @@
+[Credentials]
+API_KEY = 
+API_SECRET = 
+TOKEN = 
+
+[Paths]
+API_URL = https://api.trello.com/1/
+OUTPUT_DIRECTORY = json
