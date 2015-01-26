@@ -17,36 +17,37 @@ def main():
 		sys.exit('Config file "{0}" does not exist.'.format(configFile))
 
 	API_KEY = config.get('Credentials', 'API_KEY')
-	API_SECRET = config.get('Credentials', 'API_KEY')
 	TOKEN = config.get('Credentials', 'TOKEN')
+
 	API_URL = config.get('Paths', 'API_URL')
-	outputDirectory = config.get('Paths', 'OUTPUT_DIRECTORY')
+	OUTPUT_DIRECTORY = config.get('Paths', 'OUTPUT_DIRECTORY')
+
+	TOKEN_EXPIRATION = config.get('Options', 'TOKEN_EXPIRATION')
+	APP_NAME = config.get('Options', 'APP_NAME')
+	ORGANIZATION_ID = config.get('Options', 'ORGANIZATION_ID')
 
 	if not API_KEY:
-		print('Get an API key and come back:')
-		print("https://trello.com/1/appKey/generate")
-		API_KEY = raw_input('Enter API key: ')
-		print("Make sure to add the key to the config file.")
+		print('You need an API key to run this app.')
+		print('Visit this url: https://trello.com/1/appKey/generate')
+		API_KEY = raw_input('Then enter the API key here: ')
+		print('\n[IMPORTANT] Make sure to add the key to the config file.\n')
+		raw_input('Press enter to continue...\n')
 
 	if not TOKEN:
-		print('Get a token and come back:')
-		# expiration: "1hour", "1day", "30days", "never"
-		print("{0}connect?key={1}&name=SS-Trello-Backup&response_type=token&expiration=never".format(API_URL, API_KEY))
-		TOKEN = raw_input('Enter token: ')
-		print("Make sure to add the token to the config file.")
+		print('You need a token to run this app.')
+		print("Visit this url: {0}connect?key={1}&name={2}&response_type=token&expiration={3}".format(API_URL, API_KEY, APP_NAME, TOKEN_EXPIRATION))
+		TOKEN = raw_input('Then enter the token here: ')
+		print('\n[IMPORTANT] Make sure to add the token to the config file.\n')
+		raw_input('Press enter to continue...\n')
 
-	# whoami = requests.get(API_URL + "members/me", data={'key':API_KEY, 'token':TOKEN})
-	# meData = whoami.json()
-	# print('user name: {0}'.format(meData['username']))
-
-	# Get list of boards
+	# Parameters to get list of boards
 	boardsPayload = {
 		'key':API_KEY,
 		'token':TOKEN,
 		'filter':'open',
 		'lists':'open',
 	}
-	# Get board contents
+	# Parameters to get board contents
 	boardPayload = {
 		'key':API_KEY,
 		'token':TOKEN,
@@ -67,19 +68,26 @@ def main():
 		'organization':'false',
 	}
 	boards = requests.get(API_URL + "members/my/boards", data=boardsPayload)
-	if len(boards.json()) <= 0:
-		print("No boards found.")
+	try:
+		if len(boards.json()) <= 0:
+			print('No boards found.')
+			return
+	except ValueError:
+		print('Unable to access your boards. Check your key and token.')
 		return
-	if not os.path.exists(outputDirectory):
-		os.makedirs(outputDirectory)
+	if not os.path.exists(OUTPUT_DIRECTORY):
+		os.makedirs(OUTPUT_DIRECTORY)
 
 	print("Backing up boards:")
 	epoch_time = str(int(time.time()))
 
 	for board in boards.json():
+		if ORGANIZATION_ID and board["idOrganization"] != ORGANIZATION_ID:
+			continue
+
 		print("    - {0} ({1})".format(board["name"], board["id"]))
 		boardContents = requests.get(API_URL + "boards/" + board["id"], data=boardPayload)
-		with open(outputDirectory + '/{0}_'.format(board["name"]) + epoch_time + '.json', 'w') as file:
+		with open(OUTPUT_DIRECTORY + '/{0}_'.format(board["name"]) + epoch_time + '.json', 'w') as file:
 			json.dump(boardContents.json(), file)
 
 if __name__ == '__main__':
