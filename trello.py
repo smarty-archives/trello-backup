@@ -4,6 +4,7 @@ import ConfigParser
 import os, sys
 import json
 import requests
+import time
 
 configFile = 'trello.config'
 configFile = os.path.join(os.path.abspath(os.path.dirname(__file__)), configFile)
@@ -73,12 +74,13 @@ def main():
 		os.makedirs(outputDirectory)
 
 	print("Backing up boards:")
+	epoch_time = str(int(time.time()))
+
 	for board in boards.json():
-		if board["idOrganization"] == '4f8c6c070431ad515b5cd858': # smartystreets boards only
-			print("    - {0} ({1})".format(board["name"], board["id"]))
-			boardContents = requests.get(API_URL + "boards/" + board["id"], data=boardPayload)
-			with open(outputDirectory + '/{0}.json'.format(board["name"]), 'w') as file:
-				json.dump(boardContents.json(), file)
+		print("    - {0} ({1})".format(board["name"], board["id"]))
+		boardContents = requests.get(API_URL + "boards/" + board["id"], data=boardPayload)
+		with open(outputDirectory + '/{0}_'.format(board["name"]) + epoch_time + '.json', 'w') as file:
+			json.dump(boardContents.json(), file)
 
 if __name__ == '__main__':
 	main()
