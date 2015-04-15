@@ -87,7 +87,7 @@ def main():
 
 		print("    - {0} ({1})".format(board["name"], board["id"]))
 		boardContents = requests.get(API_URL + "boards/" + board["id"], data=boardPayload)
-		with open(OUTPUT_DIRECTORY + '/{0}_'.format(board["name"]) + epoch_time + '.json', 'w') as file:
+		with open(OUTPUT_DIRECTORY + '/{0}_'.format(board["name"].replace("/","-")) + epoch_time + '.json', 'w') as file:
 			json.dump(boardContents.json(), file)
 
 if __name__ == '__main__':
