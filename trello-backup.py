@@ -5,6 +5,7 @@ import os, sys
 import json
 import requests
 import time
+import io
 
 configFile = 'trello-backup.config'
 configFile = os.path.join(os.path.abspath(os.path.dirname(__file__)), configFile)
@@ -25,6 +26,7 @@ def main():
 	TOKEN_EXPIRATION = config.get('Options', 'TOKEN_EXPIRATION')
 	APP_NAME = config.get('Options', 'APP_NAME')
 	ORGANIZATION_ID = config.get('Options', 'ORGANIZATION_ID')
+	PRETTY_PRINT = config.get('Options', 'PRETTY_PRINT') == 'yes'
 
 	if not API_KEY:
 		print('You need an API key to run this app.')
@@ -51,7 +53,7 @@ def main():
 	boardPayload = {
 		'key':API_KEY,
 		'token':TOKEN,
-		'lists':'open',	
+		'lists':'open',
 		'fields':'all',
 		'actions':'all',
 		'action_fields':'all',
@@ -85,10 +87,12 @@ def main():
 		if ORGANIZATION_ID and board["idOrganization"] != ORGANIZATION_ID:
 			continue
 
-		print("    - {0} ({1})".format(board["name"], board["id"]))
+		print(u"    - {0} ({1})".format(board["name"], board["id"]))
 		boardContents = requests.get(API_URL + "boards/" + board["id"], data=boardPayload)
-		with open(OUTPUT_DIRECTORY + '/{0}_'.format(board["name"].replace("/","-")) + epoch_time + '.json', 'w') as file:
-			json.dump(boardContents.json(), file)
+		with io.open(OUTPUT_DIRECTORY + u'/{0}_'.format(board["name"].replace("/","-")) + epoch_time + '.json', 'w', encoding='utf8') as file:
+			args = dict( sort_keys=True, indent=4) if PRETTY_PRINT else dict()
+			data = json.dumps(boardContents.json(), ensure_ascii=False, **args)
+			file.write(unicode(data))
 
 if __name__ == '__main__':
 	main()
