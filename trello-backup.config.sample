@@ -13,3 +13,4 @@ TOKEN_EXPIRATION = never
 APP_NAME = Trello-Backup
 ; if you only want to backup organization cards, specify the trello id of the organization
 ORGANIZATION_ID =
+PRETTY_PRINT = no
