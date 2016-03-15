@@ -11,6 +11,6 @@ OUTPUT_DIRECTORY = backups
 TOKEN_EXPIRATION = never
 ; the arbitrary name that trello.com recognizes this script by
 APP_NAME = Trello-Backup
-; if you only want to backup organization cards, specify the trello id of the organization
-ORGANIZATION_ID =
+; if you only want to backup specific organization cards, specify the trello ids of the organizations
+ORGANIZATIONS_ID =
 PRETTY_PRINT = no

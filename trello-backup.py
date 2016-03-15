@@ -25,7 +25,7 @@ def main():
 
 	TOKEN_EXPIRATION = config.get('Options', 'TOKEN_EXPIRATION')
 	APP_NAME = config.get('Options', 'APP_NAME')
-	ORGANIZATION_ID = config.get('Options', 'ORGANIZATION_ID')
+	ORGANIZATIONS_ID = config.get('Options', 'ORGANIZATIONS_ID')
 	PRETTY_PRINT = config.get('Options', 'PRETTY_PRINT') == 'yes'
 
 	if not API_KEY:
@@ -84,7 +84,7 @@ def main():
 	epoch_time = str(int(time.time()))
 
 	for board in boards.json():
-		if ORGANIZATION_ID and board["idOrganization"] != ORGANIZATION_ID:
+		if ORGANIZATIONS_ID and (not board["idOrganization"] or not board["idOrganization"] in ORGANIZATIONS_ID):
 			continue
 
 		print(u"    - {0} ({1})".format(board["name"], board["id"]))
