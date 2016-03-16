@@ -7,10 +7,16 @@ API_URL = https://api.trello.com/1/
 OUTPUT_DIRECTORY = backups
 
 [Options]
-; expiration: "1hour", "1day", "30days", "never"
+; Expiration: "1hour", "1day", "30days", "never"
 TOKEN_EXPIRATION = never
-; the arbitrary name that trello.com recognizes this script by
+
+; The arbitrary name that trello.com recognizes this script by.
 APP_NAME = Trello-Backup
-; if you only want to backup specific organization cards, specify the trello ids of the organizations
-ORGANIZATIONS_ID =
+
+; If you only want to backup organization cards, specify a comma separated
+; list of the Trello organization IDs (if you know them) or names.
+ORGANIZATION_IDS = 
+; Organization names can be found in the URL: https://trello.com/{organization name}
+ORGANIZATION_NAMES = 
+
 PRETTY_PRINT = no

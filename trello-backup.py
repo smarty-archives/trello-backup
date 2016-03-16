@@ -10,6 +10,8 @@ import io
 configFile = 'trello-backup.config'
 configFile = os.path.join(os.path.abspath(os.path.dirname(__file__)), configFile)
 
+API_KEY = TOKEN = API_URL = ''
+
 def main():
 	if os.path.isfile(configFile):
 		config = ConfigParser.RawConfigParser()
@@ -17,6 +19,7 @@ def main():
 	else:
 		sys.exit('Config file "{0}" does not exist.'.format(configFile))
 
+	global API_KEY, TOKEN, API_URL
 	API_KEY = config.get('Credentials', 'API_KEY')
 	TOKEN = config.get('Credentials', 'TOKEN')
 
@@ -25,7 +28,8 @@ def main():
 
 	TOKEN_EXPIRATION = config.get('Options', 'TOKEN_EXPIRATION')
 	APP_NAME = config.get('Options', 'APP_NAME')
-	ORGANIZATIONS_ID = config.get('Options', 'ORGANIZATIONS_ID')
+	ORGANIZATION_IDS = config.get('Options', 'ORGANIZATION_IDS')
+	ORGANIZATION_NAMES = config.get('Options', 'ORGANIZATION_NAMES')
 	PRETTY_PRINT = config.get('Options', 'PRETTY_PRINT') == 'yes'
 
 	if not API_KEY:
@@ -41,6 +45,9 @@ def main():
 		TOKEN = raw_input('Then enter the token here: ')
 		print('\n[IMPORTANT] Make sure to add the token to the config file.\n')
 		raw_input('Press enter to continue...\n')
+
+	if ORGANIZATION_NAMES and not ORGANIZATION_IDS:
+		ORGANIZATION_IDS = get_organization_ids(ORGANIZATION_NAMES)
 
 	# Parameters to get list of boards
 	boardsPayload = {
@@ -80,11 +87,11 @@ def main():
 	if not os.path.exists(OUTPUT_DIRECTORY):
 		os.makedirs(OUTPUT_DIRECTORY)
 
-	print("Backing up boards:")
+	print('Backing up boards:')
 	epoch_time = str(int(time.time()))
 
 	for board in boards.json():
-		if ORGANIZATIONS_ID and (not board["idOrganization"] or not board["idOrganization"] in ORGANIZATIONS_ID):
+		if ORGANIZATION_IDS and (not board["idOrganization"] or not board["idOrganization"] in ORGANIZATION_IDS):
 			continue
 
 		print(u"    - {0} ({1})".format(board["name"], board["id"]))
@@ -93,6 +100,28 @@ def main():
 			args = dict( sort_keys=True, indent=4) if PRETTY_PRINT else dict()
 			data = json.dumps(boardContents.json(), ensure_ascii=False, **args)
 			file.write(unicode(data))
+
+def get_organization_ids(ORGANIZATION_NAMES):
+	selected_organizations = []
+	for organization in ORGANIZATION_NAMES.split(','):
+		selected_organizations.append(organization.strip())
+	organization_ids = []
+
+	# Parameters to get a list of organizations
+	organizationsPayload = {
+		'key':API_KEY,
+		'token':TOKEN,
+	}
+
+	organizations = requests.get(API_URL + "members/my/organizations", data=organizationsPayload)
+	if len(organizations.json()) <= 0:
+		print('No organizations found.')
+	else:
+		for organization in organizations.json():
+			if organization["name"] in selected_organizations:
+				organization_ids.append(organization["id"])
+	return organization_ids
+
 
 if __name__ == '__main__':
 	main()
