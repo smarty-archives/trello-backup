@@ -76,7 +76,7 @@ def main():
 		'checklist_fields':'all',
 		'organization':'false',
 	}
-	boards = requests.get(API_URL + "members/my/boards", data=boardsPayload)
+	boards = requests.get(API_URL + "members/me/boards", params=boardsPayload)
 	try:
 		if len(boards.json()) <= 0:
 			print('No boards found.')
@@ -95,7 +95,7 @@ def main():
 			continue
 
 		print(u"    - {0} ({1})".format(board["name"], board["id"]))
-		boardContents = requests.get(API_URL + "boards/" + board["id"], data=boardPayload)
+		boardContents = requests.get(API_URL + "boards/" + board["id"], params=boardPayload)
 		with io.open(OUTPUT_DIRECTORY + u'/{0}_'.format(board["name"].replace("/","-")) + epoch_time + '.json', 'w', encoding='utf8') as file:
 			args = dict( sort_keys=True, indent=4) if PRETTY_PRINT else dict()
 			data = json.dumps(boardContents.json(), ensure_ascii=False, **args)
@@ -113,7 +113,7 @@ def get_organization_ids(ORGANIZATION_NAMES):
 		'token':TOKEN,
 	}
 
-	organizations = requests.get(API_URL + "members/my/organizations", data=organizationsPayload)
+	organizations = requests.get(API_URL + "members/my/organizations", params=organizationsPayload)
 	if len(organizations.json()) <= 0:
 		print('No organizations found.')
 	else:
