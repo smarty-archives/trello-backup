@@ -94,12 +94,24 @@ def main():
 		if ORGANIZATION_IDS and (not board["idOrganization"] or not board["idOrganization"] in ORGANIZATION_IDS):
 			continue
 
-		print(u"    - {0} ({1})".format(board["name"], board["id"]))
+		print(u"    - {0} - {1} ({2})".format(board["idOrganization"], board["name"], board["id"]))
 		boardContents = requests.get(API_URL + "boards/" + board["id"], params=boardPayload)
-		with io.open(OUTPUT_DIRECTORY + u'/{0}_'.format(board["name"].replace("/","-")) + epoch_time + '.json', 'w', encoding='utf8') as file:
+		filename = boardFilename(OUTPUT_DIRECTORY, board, epoch_time)
+		with io.open(filename, 'w', encoding='utf8') as file:
 			args = dict( sort_keys=True, indent=4) if PRETTY_PRINT else dict()
 			data = json.dumps(boardContents.json(), ensure_ascii=False, **args)
 			file.write(unicode(data))
+
+def boardFilename(output_dir, board, epoch_time):
+	organization_id = sanitize(board["idOrganization"])
+	boardName = sanitize(board["name"])
+
+	formatted = u'{0}-{1}_'.format(organization_id, boardName)
+	filename = formatted + epoch_time + '.json'
+	return os.path.join(output_dir, filename)
+
+def sanitize(name):
+	return name.replace("/","-").replace(":","-")
 
 def get_organization_ids(ORGANIZATION_NAMES):
 	selected_organizations = []
