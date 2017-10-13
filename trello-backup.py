@@ -60,7 +60,6 @@ def main():
 	boardPayload = {
 		'key':API_KEY,
 		'token':TOKEN,
-		'lists':'open',
 		'fields':'all',
 		'actions':'all',
 		'action_fields':'all',
@@ -78,7 +77,7 @@ def main():
 	}
 	boards = requests.get(API_URL + "members/me/boards", params=boardsPayload)
 	try:
-		if len(boards.json()) <= 0:
+		if len(boards.json) <= 0:
 			print('No boards found.')
 			return
 	except ValueError:
@@ -90,7 +89,7 @@ def main():
 	print('Backing up boards:')
 	epoch_time = str(int(time.time()))
 
-	for board in boards.json():
+	for board in boards.json:
 		if ORGANIZATION_IDS and (not board["idOrganization"] or not board["idOrganization"] in ORGANIZATION_IDS):
 			continue
 
@@ -99,7 +98,7 @@ def main():
 		filename = boardFilename(OUTPUT_DIRECTORY, board, epoch_time)
 		with io.open(filename, 'w', encoding='utf8') as file:
 			args = dict( sort_keys=True, indent=4) if PRETTY_PRINT else dict()
-			data = json.dumps(boardContents.json(), ensure_ascii=False, **args)
+			data = json.dumps(boardContents.json, ensure_ascii=False, **args)
 			file.write(unicode(data))
 
 def boardFilename(output_dir, board, epoch_time):
@@ -126,10 +125,10 @@ def get_organization_ids(ORGANIZATION_NAMES):
 	}
 
 	organizations = requests.get(API_URL + "members/my/organizations", params=organizationsPayload)
-	if len(organizations.json()) <= 0:
+	if len(organizations.json) <= 0:
 		print('No organizations found.')
 	else:
-		for organization in organizations.json():
+		for organization in organizations.json:
 			if organization["name"] in selected_organizations:
 				organization_ids.append(organization["id"])
 	return organization_ids
