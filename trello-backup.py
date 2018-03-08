@@ -1,6 +1,6 @@
 #!/usr/bin/env python -u
 
-import ConfigParser
+import configparser
 import os, sys
 import json
 import requests
@@ -14,7 +14,7 @@ API_KEY = TOKEN = API_URL = ''
 
 def main():
 	if os.path.isfile(configFile):
-		config = ConfigParser.RawConfigParser()
+		config = configparser.RawConfigParser()
 		config.read(configFile)
 	else:
 		sys.exit('Config file "{0}" does not exist.'.format(configFile))
@@ -100,7 +100,7 @@ def main():
 		with io.open(filename, 'w', encoding='utf8') as file:
 			args = dict( sort_keys=True, indent=4) if PRETTY_PRINT else dict()
 			data = json.dumps(boardContents.json(), ensure_ascii=False, **args)
-			file.write(unicode(data))
+			file.write(data)
 
 def boardFilename(output_dir, board, epoch_time):
 	organization_id = sanitize(board["idOrganization"])
