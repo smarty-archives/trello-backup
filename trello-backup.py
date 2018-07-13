@@ -112,7 +112,7 @@ def boardFilename(output_dir, board, epoch_time):
 
 def sanitize(name):
 	if name is None:
-		return ""
+		return "None"
 
 	return name.replace("/","-").replace(":","-")
 
