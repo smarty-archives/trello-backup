@@ -111,6 +111,9 @@ def boardFilename(output_dir, board, epoch_time):
 	return os.path.join(output_dir, filename)
 
 def sanitize(name):
+	if name is None:
+		return ""
+
 	return name.replace("/","-").replace(":","-")
 
 def get_organization_ids(ORGANIZATION_NAMES):
