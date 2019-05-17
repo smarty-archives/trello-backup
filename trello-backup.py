@@ -60,7 +60,6 @@ def main():
 	boardPayload = {
 		'key':API_KEY,
 		'token':TOKEN,
-		'lists':'open',
 		'fields':'all',
 		'actions':'all',
 		'action_fields':'all',
